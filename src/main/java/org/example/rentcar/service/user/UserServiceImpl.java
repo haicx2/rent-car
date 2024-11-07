@@ -5,7 +5,11 @@ import org.example.rentcar.dto.EntityConverter;
 import org.example.rentcar.dto.UserDto;
 import org.example.rentcar.exception.AlreadyExistException;
 import org.example.rentcar.exception.ResourceNotFoundException;
+import org.example.rentcar.model.CarOwner;
+import org.example.rentcar.model.Customer;
 import org.example.rentcar.model.User;
+import org.example.rentcar.repository.CarOwnerRepository;
+import org.example.rentcar.repository.CustomerRepository;
 import org.example.rentcar.repository.UserRepository;
 import org.example.rentcar.request.RegisterRequest;
 import org.example.rentcar.request.UpdateUserRequest;
@@ -20,6 +24,8 @@ import java.util.List;
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final CarOwnerRepository carOwnerRepository;
+    private final CustomerRepository customerRepository;
     private final ModelMapper modelMapper;
     private final EntityConverter<User, UserDto> userEntityConverter;
 
@@ -29,8 +35,19 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new AlreadyExistException("Email already exists");
         }
-        User user = modelMapper.map(registerRequest, User.class);
-        return userRepository.save(user);
+
+        switch (registerRequest.getRole()) {
+            case "OWNER" ->{
+                CarOwner user = modelMapper.map(registerRequest, CarOwner.class);
+                return carOwnerRepository.save(user);
+            }
+            case "CUSTOMER" ->{
+                Customer user = modelMapper.map(registerRequest, Customer.class);
+                return customerRepository.save(user);
+            }
+            default -> throw new ResourceNotFoundException("Invalid role");
+        }
+
     }
 
     @Override
