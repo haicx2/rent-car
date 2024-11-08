@@ -2,6 +2,7 @@ package org.example.rentcar.service.review;
 
 import org.example.rentcar.model.Review;
 import org.example.rentcar.request.ReviewRequest;
+import org.springframework.data.domain.Page;
 
 import java.util.List;
 
@@ -17,8 +18,13 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<Review> getReviewsByCarId(long carId) {
-        return List.of();
+    public Page<Review> getReviewsByCarId(long carId, int page, int size) {
+        return null;
+    }
+
+    @Override
+    public Double getAverageRatingByCarId(long carId) {
+        return 0.0;
     }
 
     @Override
@@ -27,8 +33,8 @@ public class ReviewServiceImpl implements ReviewService {
     }
 
     @Override
-    public List<Review> getReviewsByCustomerId(long customerId) {
-        return List.of();
+    public Page<Review> getReviewsByCustomerId(long customerId, int page, int size) {
+        return null;
     }
 
     @Override
