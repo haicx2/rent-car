@@ -13,4 +13,5 @@ public class UrlMapping {
     public static final String ADD = "/add";
     public static final String GET_BY_OWNER_ID = "/owner/get/{ownerId}";
     public static final String UPDATE_IMAGE_BY_ID = "/update/image/{carId}";
+    public static final String BOOKING = API + "/booking";
 }

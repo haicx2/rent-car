@@ -22,7 +22,6 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @CreationTimestamp
     @JsonFormat(pattern = "yyyy-MM-dd-HH-mm")
     private LocalDateTime startDate;
     @JsonFormat(pattern = "yyyy-MM-dd-HH-mm")

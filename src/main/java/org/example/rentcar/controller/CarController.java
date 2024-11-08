@@ -8,6 +8,7 @@ import org.example.rentcar.response.APIResponse;
 import org.example.rentcar.service.car.CarService;
 import org.example.rentcar.utils.FeedBackMessage;
 import org.example.rentcar.utils.UrlMapping;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -28,8 +29,9 @@ public class CarController {
     }
 
     @GetMapping(UrlMapping.GET_ALL)
-    public ResponseEntity<APIResponse> getAllCars() {
-        List<Car> cars = carService.findAll();
+    public ResponseEntity<APIResponse> getAllCars(@RequestParam int size,
+                                                  @RequestParam int page) {
+        Page<Car> cars = carService.findAll(size,page);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.FOUND, cars));
     }
 

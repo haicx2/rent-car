@@ -4,6 +4,7 @@ import org.example.rentcar.model.Car;
 import org.example.rentcar.model.CarOwner;
 import org.example.rentcar.request.CarRegisterRequest;
 import org.example.rentcar.request.UpdateCarRequest;
+import org.springframework.data.domain.Page;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -11,7 +12,7 @@ import java.util.List;
 
 public interface CarService {
     Car save(CarRegisterRequest carRegisterRequest, long ownerId) throws IOException;
-    List<Car> findAll();
+    Page<Car> findAll(int size, int page);
     Car findById(long carId);
     List<Car> findByOwnerId(long ownerId);
     Car update(long carId, UpdateCarRequest carRequest);

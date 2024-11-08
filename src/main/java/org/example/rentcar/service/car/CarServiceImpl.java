@@ -10,6 +10,8 @@ import org.example.rentcar.request.CarRegisterRequest;
 import org.example.rentcar.request.UpdateCarRequest;
 import org.example.rentcar.utils.FeedBackMessage;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -34,8 +36,9 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public List<Car> findAll() {
-        return carRepository.findAll();
+    public Page<Car> findAll(int size, int page) {
+        PageRequest pageRequest = PageRequest.of(page, size);
+        return carRepository.findAll(pageRequest);
     }
 
     @Override
