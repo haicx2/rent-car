@@ -10,6 +10,8 @@ import lombok.Setter;
 
 import java.sql.Blob;
 import java.time.Year;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -43,4 +45,6 @@ public class Car {
     @JsonIgnore
     @JsonBackReference
     private CarOwner owner;
+    @Transient
+    List<Review> reviews = new ArrayList<>();
 }

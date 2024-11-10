@@ -25,7 +25,9 @@ public class Review {
     @JsonFormat(pattern = "yyyy-MM-dd-HH-mm")
     private LocalDateTime created;
     @ManyToOne
+    @JoinColumn(name = "customer_id")
     private Customer customer;
     @ManyToOne
+    @JoinColumn(name = "car_id")
     private Car car;
 }

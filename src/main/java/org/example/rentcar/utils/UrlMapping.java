@@ -4,6 +4,7 @@ public class UrlMapping {
     public static final String API = "/api/v1";
     public static final String USER = API + "/user";
     public static final String CAR = API + "/car";
+    public static final String REVIEW = API + "/review";
     public static final String GET_BY_ID = "/get/{id}";
     public static final String GET_ALL = "/get/all";
     public static final String GET_BY_EMAIL = "/get/{email}";
@@ -14,4 +15,6 @@ public class UrlMapping {
     public static final String GET_BY_OWNER_ID = "/owner/get/{ownerId}";
     public static final String UPDATE_IMAGE_BY_ID = "/update/image/{carId}";
     public static final String BOOKING = API + "/booking";
+    public static final String GET_BY_CUSTOMER_ID = "/get/{customerId}";
+    public static final String GET_BY_CAR_ID = "/get/{carId}";
 }
