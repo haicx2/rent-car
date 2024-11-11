@@ -1,26 +1,12 @@
-package org.example.rentcar.model;
+package org.example.rentcar.dto;
 
-import com.fasterxml.jackson.annotation.JsonBackReference;
-import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.Data;
+import org.example.rentcar.model.CarOwner;
 
 import java.time.Year;
-import java.util.ArrayList;
-import java.util.List;
 
-@Entity
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class Car {
-    @Transient
-    List<Review> reviews = new ArrayList<>();
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Data
+public class CarDto {
     private long id;
     private String name;
     private String licensePlate;
@@ -39,9 +25,6 @@ public class Car {
     private String description;
     private String additionalFunction;
     private String termOfUse;
-    @Lob
     private byte[] image;
-    @ManyToOne
-    @JsonBackReference
-    private CarOwner owner;
+    private String ownerEmail;
 }

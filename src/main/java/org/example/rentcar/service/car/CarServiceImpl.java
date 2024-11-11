@@ -1,6 +1,7 @@
 package org.example.rentcar.service.car;
 
 import lombok.RequiredArgsConstructor;
+import org.example.rentcar.dto.CarDto;
 import org.example.rentcar.exception.ResourceNotFoundException;
 import org.example.rentcar.model.Car;
 import org.example.rentcar.model.CarOwner;
@@ -77,5 +78,17 @@ public class CarServiceImpl implements CarService {
     public CarOwner findCarOwnerByCarId(long carId) {
         Car car = findById(carId);
         return carOwnerRepository.findById(car.getOwner().getId()).orElseThrow(() -> new ResourceNotFoundException("Car owner not found"));
+    }
+
+    @Override
+    public List<CarDto> findAllCarsNoPage() {
+        List<Car> cars = carRepository.findAll();
+        return cars.stream().map(this::mapCarToCarDTO).toList();
+    }
+
+    public CarDto mapCarToCarDTO(Car car) {
+        CarDto carDto = modelMapper.map(car, CarDto.class);
+        carDto.setOwnerEmail(car.getOwner().getEmail());
+        return carDto;
     }
 }

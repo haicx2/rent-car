@@ -1,5 +1,6 @@
 package org.example.rentcar.service.car;
 
+import org.example.rentcar.dto.CarDto;
 import org.example.rentcar.model.Car;
 import org.example.rentcar.model.CarOwner;
 import org.example.rentcar.request.CarRegisterRequest;
@@ -18,6 +19,6 @@ public interface CarService {
     Car update(long carId, UpdateCarRequest carRequest);
     void deleteById(long carId);
     Car saveImage(long carId, MultipartFile file) throws IOException;
-
     CarOwner findCarOwnerByCarId(long carId);
+    List<CarDto> findAllCarsNoPage();
 }

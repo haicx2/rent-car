@@ -16,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
+@CrossOrigin("http://localhost:5173/")
 @RestController
 @RequestMapping(UrlMapping.CAR)
 @RequiredArgsConstructor
@@ -64,5 +65,11 @@ public class CarController {
     public ResponseEntity<APIResponse> deleteCarById(@PathVariable int id) {
         carService.deleteById(id);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.DELETE_SUCCESS, null));
+    }
+
+    @GetMapping("/get/allcars")
+    public ResponseEntity<APIResponse> getAllCars() {
+        List<Car> cars = carService.findAllCarsNoPage();
+        return ResponseEntity.ok(new APIResponse(FeedBackMessage.FOUND, cars));
     }
 }
