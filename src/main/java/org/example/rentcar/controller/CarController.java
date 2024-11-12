@@ -1,6 +1,7 @@
 package org.example.rentcar.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.rentcar.dto.CarDto;
 import org.example.rentcar.model.Car;
 import org.example.rentcar.request.CarRegisterRequest;
 import org.example.rentcar.request.UpdateCarRequest;
@@ -69,7 +70,15 @@ public class CarController {
 
     @GetMapping("/get/allcars")
     public ResponseEntity<APIResponse> getAllCars() {
-        List<Car> cars = carService.findAllCarsNoPage();
+        List<CarDto> cars = carService.findAllCarsNoPage();
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.FOUND, cars));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<APIResponse> searchCars(@RequestParam(required = false) String ownerEmail,
+                                                  @RequestParam(required = false) String name,
+                                                  @RequestParam(required = false) String brand) {
+        List<CarDto> carDtos = carService.findCarBySearchQuery(ownerEmail, name, brand);
+        return ResponseEntity.ok(new APIResponse(FeedBackMessage.FOUND, carDtos));
     }
 }

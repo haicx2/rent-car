@@ -21,4 +21,5 @@ public interface CarService {
     Car saveImage(long carId, MultipartFile file) throws IOException;
     CarOwner findCarOwnerByCarId(long carId);
     List<CarDto> findAllCarsNoPage();
+    List<CarDto> findCarBySearchQuery(String ownerEmail, String carName, String brand);
 }

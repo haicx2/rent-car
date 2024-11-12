@@ -9,6 +9,7 @@ import org.example.rentcar.repository.CarOwnerRepository;
 import org.example.rentcar.repository.CarRepository;
 import org.example.rentcar.request.CarRegisterRequest;
 import org.example.rentcar.request.UpdateCarRequest;
+import org.example.rentcar.service.user.UserService;
 import org.example.rentcar.utils.FeedBackMessage;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -26,6 +27,7 @@ public class CarServiceImpl implements CarService {
     private final CarRepository carRepository;
     private final CarOwnerRepository carOwnerRepository;
     private final ModelMapper modelMapper;
+    private final UserService userService;
 
     @Override
     @Transactional
@@ -83,6 +85,34 @@ public class CarServiceImpl implements CarService {
     @Override
     public List<CarDto> findAllCarsNoPage() {
         List<Car> cars = carRepository.findAll();
+        return cars.stream().map(this::mapCarToCarDTO).toList();
+    }
+
+    @Override
+    public List<CarDto> findCarBySearchQuery(String ownerEmail, String carName, String brand) {
+        List<Car> cars;
+        if (ownerEmail != null && carName != null && brand != null) {
+            CarOwner owner = (CarOwner) userService.getUserByEmail(ownerEmail);
+            cars = carRepository.findAllByOwnerIdAndNameAndBrand(owner.getId(), carName, brand);
+        } else if (ownerEmail != null && carName != null) {
+            CarOwner owner = (CarOwner) userService.getUserByEmail(ownerEmail);
+            cars = carRepository.findAllByOwnerIdAndName(owner.getId(), carName);
+        } else if (ownerEmail != null && brand != null) {
+            CarOwner owner = (CarOwner) userService.getUserByEmail(ownerEmail);
+            cars = carRepository.findAllByOwnerIdAndBrand(owner.getId(), brand);
+        } else if (carName != null && brand != null) {
+            cars = carRepository.findAllByNameAndBrand(carName, brand);
+        } else if (ownerEmail != null) {
+            CarOwner owner = (CarOwner) userService.getUserByEmail(ownerEmail);
+            cars = carRepository.findAllByOwnerId(owner.getId());
+        } else if (carName != null) {
+            cars = carRepository.findAllByName(carName);
+        } else if (brand != null) {
+            cars = carRepository.findAllByBrand(brand);
+        } else {
+            throw new ResourceNotFoundException("No search parameters provided");
+        }
+
         return cars.stream().map(this::mapCarToCarDTO).toList();
     }
 

@@ -32,6 +32,7 @@ public class User {
     private String drivingLicense;
     private double wallet;
     private String role;
+    private double deposit = 0;
     @Transient
     List<Review> reviews = new ArrayList<>();
 }
