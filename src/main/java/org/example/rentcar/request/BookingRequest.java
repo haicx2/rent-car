@@ -7,9 +7,7 @@ import java.time.LocalDate;
 
 @Data
 public class BookingRequest {
-    @JsonFormat(pattern = "yyyy-MM-dd-HH-mm")
-    private LocalDate startDate;
-    @JsonFormat(pattern = "yyyy-MM-dd-HH-mm")
-    private LocalDate endDate;
+    private String startDate;
+    private String endDate;
     private String paymentMethod;
 }

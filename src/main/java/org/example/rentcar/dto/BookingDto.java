@@ -15,14 +15,11 @@ import java.time.LocalDate;
 @AllArgsConstructor
 public class BookingDto {
     private long id;
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate startDate;
-    @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
     private CustomerDto customer;
     private CarDto car;
     private String paymentMethod = "WALLET";
-    @Enumerated(EnumType.STRING)
     private BookingStatus status;
     private String bookingNo;
     private Double bill;
