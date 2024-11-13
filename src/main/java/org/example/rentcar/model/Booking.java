@@ -7,10 +7,9 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.rentcar.enums.BookingStatus;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.Random;
 
 @Entity
@@ -22,10 +21,10 @@ public class Booking {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @JsonFormat(pattern = "yyyy-MM-dd-HH-mm")
-    private LocalDateTime startDate;
-    @JsonFormat(pattern = "yyyy-MM-dd-HH-mm")
-    private LocalDateTime endDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate startDate;
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate endDate;
 
     @OneToOne
     @JoinColumn(name = "customer_id")
@@ -33,12 +32,26 @@ public class Booking {
     @OneToOne
     @JoinColumn(name = "car_id")
     private Car car;
-    private String paymentMethod;
+    private String paymentMethod = "WALLET";
     @Enumerated(EnumType.STRING)
     private BookingStatus status;
     private String bookingNo;
+    private Double bill;
 
     public void setAppointmentNo() {
         this.bookingNo = String.valueOf(new Random().nextLong()).substring(1,11);
+    }
+    public double getOverAllPrice() {
+        int rentDays = 0;
+        if (this.startDate != null && this.endDate != null && !this.startDate.isAfter(this.endDate)) {
+            rentDays = (int) ChronoUnit.DAYS.between(this.startDate, this.endDate);
+        } else {
+            throw new IllegalArgumentException("Start date must be before or equal to end date");
+        }
+        double price = rentDays*this.car.getBasePrice();
+        if(price > this.customer.getWallet()){
+            throw new IllegalArgumentException("Nigga you broke.");
+        }
+        return price;
     }
 }

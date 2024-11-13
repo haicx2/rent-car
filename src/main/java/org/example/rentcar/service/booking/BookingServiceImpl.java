@@ -37,6 +37,8 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = modelMapper.map(bookingRequest, Booking.class);
         booking.setCar(car);
         booking.setCustomer(customer);
+        booking.setBill(booking.getOverAllPrice());
+        booking.setAppointmentNo();
         booking.setStatus(BookingStatus.WAITING_FOR_APPROVAL);
         return bookingRepository.save(booking);
     }
@@ -60,26 +62,32 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public Booking updateBooking(BookingUpdateRequest bookingUpdateRequest, long bookingId) {
         Booking booking = getBookingById(bookingId);
-        if(booking.getStatus() == BookingStatus.APPROVED) {
-            throw new ResourceNotFoundException(FeedBackMessage.ALREADY_APPROVED);
-        }
         booking.setStatus(bookingUpdateRequest.getStatus());
-        bookingStatusHandle(bookingId, booking);
+        bookingStatusHandle(booking);
         return bookingRepository.save(booking);
     }
 
-    private void bookingStatusHandle(long bookingId, Booking booking) {
+    private void bookingStatusHandle(Booking booking) {
         if(booking.getStatus() == BookingStatus.COMPLETED) {
             Car car = carService.findById(booking.getCar().getId());
-            Customer customer = customerRepository.findById(booking.getCustomer().getId()).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+            Customer customer = customerRepository.findById(booking.getCustomer().getId()).orElseThrow(
+                    () -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND)
+            );
             CarOwner carOwner = carService.findCarOwnerByCarId(car.getId());
-            customer.setWallet(customer.getWallet() - car.getBasePrice() +car.getDeposit());
-            carOwner.setWallet(carOwner.getWallet() + car.getBasePrice());
+            customer.setWallet(customer.getWallet() - booking.getBill() +car.getDeposit());
+            carOwner.setWallet(carOwner.getWallet() + booking.getBill());
             customerRepository.save(customer);
             carOwnerRepository.save(carOwner);
         }
         else if (booking.getStatus() == BookingStatus.REJECTED) {
-            deleteBooking(bookingId);
+            deleteBooking(booking.getId());
+        } else if(booking.getStatus() == BookingStatus.APPROVED) {
+            Car car = carService.findById(booking.getCar().getId());
+            Customer customer = customerRepository.findById(booking.getCustomer().getId()).orElseThrow(
+                    () -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND)
+            );
+            customer.setWallet(customer.getWallet() - car.getDeposit());
+            customerRepository.save(customer);
         }
     }
 
