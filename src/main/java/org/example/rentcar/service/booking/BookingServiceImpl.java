@@ -19,6 +19,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -33,6 +34,11 @@ public class BookingServiceImpl implements BookingService {
     @Override
     public Booking bookCar(BookingRequest bookingRequest, long carId, long customerId) {
         Car car = carService.findById(carId);
+        Booking bookingBefore = bookingRepository.findByStatusAndCarId(BookingStatus.APPROVED, carId);
+        if(checkDateInRange(bookingBefore.getStartDate(), bookingRequest.getStartDate(), bookingRequest.getEndDate())
+         || checkDateInRange(bookingBefore.getEndDate(), bookingRequest.getStartDate(), bookingRequest.getEndDate())) {
+            throw new IllegalArgumentException("Car is already booked in that time");
+        }
         Customer customer = customerRepository.findById(customerId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
         Booking booking = modelMapper.map(bookingRequest, Booking.class);
         booking.setCar(car);
@@ -67,7 +73,7 @@ public class BookingServiceImpl implements BookingService {
         return bookingRepository.save(booking);
     }
 
-    private void bookingStatusHandle(Booking booking) {
+    public void bookingStatusHandle(Booking booking) {
         if(booking.getStatus() == BookingStatus.COMPLETED) {
             Car car = carService.findById(booking.getCar().getId());
             Customer customer = customerRepository.findById(booking.getCustomer().getId()).orElseThrow(
@@ -89,6 +95,10 @@ public class BookingServiceImpl implements BookingService {
             customer.setWallet(customer.getWallet() - car.getDeposit());
             customerRepository.save(customer);
         }
+    }
+
+    public boolean checkDateInRange(LocalDate date, LocalDate startDate, LocalDate endDate) {
+        return (date.isAfter(startDate) || date.isEqual(startDate) || date.isBefore(endDate) || date.isEqual(endDate));
     }
 
     @Override
