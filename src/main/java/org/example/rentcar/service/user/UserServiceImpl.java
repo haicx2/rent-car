@@ -80,4 +80,11 @@ public class UserServiceImpl implements UserService {
         List<User> users = userRepository.findAll();
         return users.stream().map(user -> userEntityConverter.mapEntityToDTO(user,UserDto.class)).toList();
     }
+
+    @Override
+    public UserDto getUserDetails(long userId) {
+        User user = getUserById(userId);
+        UserDto userDto = modelMapper.map(user, UserDto.class);
+        return null;
+    }
 }

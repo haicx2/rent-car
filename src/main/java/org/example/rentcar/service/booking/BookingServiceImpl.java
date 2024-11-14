@@ -46,6 +46,7 @@ public class BookingServiceImpl implements BookingService {
         booking.setCar(car);
         booking.setCustomer(customer);
         booking.setAppointmentNo();
+        booking.setBill(booking.getOverAllPrice());
         booking.setStatus(BookingStatus.WAITING_FOR_APPROVAL);
         return bookingRepository.save(booking);
     }

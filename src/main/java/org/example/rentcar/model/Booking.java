@@ -42,7 +42,7 @@ public class Booking {
         this.bookingNo = String.valueOf(new Random().nextLong()).substring(1,11);
     }
     public double getOverAllPrice() {
-        int rentDays = (int) ChronoUnit.DAYS.between(this.getStartDate(), this.getEndDate());
+        long rentDays = ChronoUnit.DAYS.between(this.getStartDate(), this.getEndDate());
         double price = rentDays*this.car.getBasePrice();
         if(price > this.customer.getWallet() || this.customer.getWallet() < car.getDeposit()){
             throw new IllegalArgumentException("You don't have enough Hai coin to book this car for this many days.");

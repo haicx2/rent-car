@@ -3,6 +3,7 @@ package org.example.rentcar.dto;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 public class UserDto {
@@ -16,4 +17,7 @@ public class UserDto {
     private String drivingLicense;
     private double wallet;
     private String role;
+    List<ReviewDto> reviewDtos;
+    List<BookingDto> bookingDtos;
+    List<CarDto> carDtos;
 }
