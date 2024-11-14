@@ -26,10 +26,10 @@ public class Booking {
     @JsonFormat(pattern = "yyyy-MM-dd")
     private LocalDate endDate;
 
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "customer_id")
     private Customer customer;
-    @OneToOne
+    @ManyToOne
     @JoinColumn(name = "car_id")
     private Car car;
     private String paymentMethod = "WALLET";
