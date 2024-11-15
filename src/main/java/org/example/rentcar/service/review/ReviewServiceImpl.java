@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.rentcar.model.Car;
 import org.example.rentcar.model.Customer;
 import org.example.rentcar.model.Review;
+import org.example.rentcar.repository.CarRepository;
 import org.example.rentcar.repository.CustomerRepository;
 import org.example.rentcar.repository.ReviewRepository;
 import org.example.rentcar.request.ReviewRequest;
@@ -20,13 +21,17 @@ import java.util.OptionalDouble;
 @RequiredArgsConstructor
 public class ReviewServiceImpl implements ReviewService {
     private final ReviewRepository reviewRepository;
-    private final CarService carService;
+    private final CarRepository carRepository;
     private final CustomerRepository CustomerRepository;
+
     @Override
     @Transactional
-    public Review saveReview(ReviewRequest reviewRequest,long customerId, long carId) {
+    public Review saveReview(ReviewRequest reviewRequest, long customerId, long carId) {
+        Car car = carRepository.findById(carId).orElseThrow(() -> new RuntimeException("Car not found"));
+        if (car.getOwner().getId() == customerId) {
+            throw new IllegalArgumentException("Dinh buff ban ah ?");
+        }
         Customer customer = CustomerRepository.findById(customerId).orElseThrow(() -> new RuntimeException("Customer not found"));
-        Car car = carService.findById(carId);
         Review review = new Review();
         review.setRating(reviewRequest.getRating());
         review.setComment(reviewRequest.getComment());
@@ -46,6 +51,7 @@ public class ReviewServiceImpl implements ReviewService {
         return reviewRepository.findAllByCarId(carId, pageRequest);
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Double getAverageRatingByCarId(long carId) {
         List<Review> reviews = getReviewsByCarId(carId, 0, 5).getContent();
@@ -77,4 +83,5 @@ public class ReviewServiceImpl implements ReviewService {
         Review review = getReviewById(reviewId);
         reviewRepository.delete(review);
     }
+
 }

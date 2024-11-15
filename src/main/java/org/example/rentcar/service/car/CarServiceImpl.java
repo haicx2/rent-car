@@ -1,14 +1,20 @@
 package org.example.rentcar.service.car;
 
 import lombok.RequiredArgsConstructor;
+import org.example.rentcar.config.Mapper;
+import org.example.rentcar.dto.BookingDto;
 import org.example.rentcar.dto.CarDto;
+import org.example.rentcar.dto.ReviewDto;
 import org.example.rentcar.exception.ResourceNotFoundException;
 import org.example.rentcar.model.Car;
 import org.example.rentcar.model.CarOwner;
+import org.example.rentcar.repository.BookingRepository;
 import org.example.rentcar.repository.CarOwnerRepository;
 import org.example.rentcar.repository.CarRepository;
+import org.example.rentcar.repository.ReviewRepository;
 import org.example.rentcar.request.CarRegisterRequest;
 import org.example.rentcar.request.UpdateCarRequest;
+import org.example.rentcar.service.review.ReviewService;
 import org.example.rentcar.service.user.UserService;
 import org.example.rentcar.utils.FeedBackMessage;
 import org.modelmapper.ModelMapper;
@@ -19,7 +25,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,6 +36,10 @@ public class CarServiceImpl implements CarService {
     private final CarOwnerRepository carOwnerRepository;
     private final ModelMapper modelMapper;
     private final UserService userService;
+    private final ReviewRepository reviewRepository;
+    private final ReviewService reviewService;
+    private final Mapper mapper;
+    private final BookingRepository bookingRepository;
 
     @Override
     @Transactional
@@ -50,8 +62,11 @@ public class CarServiceImpl implements CarService {
     }
 
     @Override
-    public List<Car> findByOwnerId(long ownerId) {
-        return carRepository.findAllByOwnerId(ownerId);
+    public List<CarDto> findByOwnerId(long ownerId) {
+        List<Car> cars = carRepository.findAllByOwnerId(ownerId);
+        return cars.stream()
+                .map(car -> getCarDetails(car.getId()))
+                .toList();
     }
 
     @Override
@@ -85,7 +100,7 @@ public class CarServiceImpl implements CarService {
     @Override
     public List<CarDto> findAllCarsNoPage() {
         List<Car> cars = carRepository.findAll();
-        return cars.stream().map(this::mapCarToCarDTO).toList();
+        return cars.stream().map(car -> getCarDetails(car.getId())).toList();
     }
 
     @Override
@@ -113,12 +128,20 @@ public class CarServiceImpl implements CarService {
             throw new ResourceNotFoundException("No search parameters provided");
         }
 
-        return cars.stream().map(this::mapCarToCarDTO).toList();
+        return cars.stream().map(car -> getCarDetails(car.getId())).toList();
     }
 
-    public CarDto mapCarToCarDTO(Car car) {
-        CarDto carDto = modelMapper.map(car, CarDto.class);
-        carDto.setOwnerEmail(car.getOwner().getEmail());
-        return carDto;
+    @Override
+    public CarDto getCarDetails(long carId) {
+        Car car = findById(carId);
+        List<ReviewDto> reviews = reviewRepository.findByCarId(carId)
+                .stream().map(mapper::mapReviewToDto)
+                .toList();
+        List<BookingDto> bookingDtos = bookingRepository
+                .findAllByCarId(carId)
+                .stream()
+                .map(mapper::mapBookingToDto)
+                .toList();
+        return mapper.mapCarToDto(car,reviews,bookingDtos,reviewService.getAverageRatingByCarId(carId),reviewRepository.countByCarId(carId));
     }
 }

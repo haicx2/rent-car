@@ -1,6 +1,7 @@
 package org.example.rentcar.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.rentcar.dto.BookingDto;
 import org.example.rentcar.model.Booking;
 import org.example.rentcar.request.BookingRequest;
 import org.example.rentcar.request.BookingUpdateRequest;
@@ -23,8 +24,8 @@ public class BookingController {
     public ResponseEntity<APIResponse> bookCar(@RequestBody BookingRequest bookingRequest,
                                                @RequestParam long carId,
                                                @RequestParam long customerId) {
-        bookingService.bookCar(bookingRequest, carId, customerId);
-        return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, bookingRequest));
+        Booking book = bookingService.bookCar(bookingRequest, carId, customerId);
+        return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, book.getId()));
     }
 
     @GetMapping(UrlMapping.GET_ALL)
@@ -35,7 +36,7 @@ public class BookingController {
 
     @GetMapping(UrlMapping.GET_BY_ID)
     public ResponseEntity<APIResponse> getBooking(@PathVariable long id) {
-        Booking booking = bookingService.getBookingById(id);
+        BookingDto booking = bookingService.getBookingDtoById(id);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking));
     }
 
@@ -43,7 +44,7 @@ public class BookingController {
     public ResponseEntity<APIResponse> updateBooking(@PathVariable long id,
                                                      @RequestBody BookingUpdateRequest bookingUpdateRequest) {
         Booking booking = bookingService.updateBooking(bookingUpdateRequest,id);
-        return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking));
+        return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking.getId()));
     }
 
     @DeleteMapping(UrlMapping.DELETE_BY_ID)

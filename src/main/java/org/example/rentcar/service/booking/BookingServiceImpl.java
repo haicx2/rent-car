@@ -1,6 +1,8 @@
 package org.example.rentcar.service.booking;
 
 import lombok.RequiredArgsConstructor;
+import org.example.rentcar.config.Mapper;
+import org.example.rentcar.dto.BookingDto;
 import org.example.rentcar.enums.BookingStatus;
 import org.example.rentcar.exception.ResourceNotFoundException;
 import org.example.rentcar.model.Booking;
@@ -9,31 +11,32 @@ import org.example.rentcar.model.CarOwner;
 import org.example.rentcar.model.Customer;
 import org.example.rentcar.repository.BookingRepository;
 import org.example.rentcar.repository.CarOwnerRepository;
+import org.example.rentcar.repository.CarRepository;
 import org.example.rentcar.repository.CustomerRepository;
 import org.example.rentcar.request.BookingRequest;
 import org.example.rentcar.request.BookingUpdateRequest;
-import org.example.rentcar.service.car.CarService;
 import org.example.rentcar.utils.FeedBackMessage;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository bookingRepository;
-    private final CarService carService;
+    private final CarRepository carRepository;
     private final CustomerRepository customerRepository;
     private final CarOwnerRepository carOwnerRepository;
+    private final Mapper mapper;
 
     @Override
     @Transactional
     public Booking bookCar(BookingRequest bookingRequest, long carId, long customerId) {
-        Car car = carService.findById(carId);
-        Booking bookingBefore = bookingRepository.findByStatusAndCarId(BookingStatus.APPROVED, carId);
+        Car car = getCarById(carId);
+                Booking bookingBefore = bookingRepository.findByStatusAndCarId(BookingStatus.APPROVED, carId);
         if (bookingBefore != null && (checkDateInRange(bookingBefore.getStartDate(), LocalDate.parse(bookingRequest.getStartDate()), LocalDate.parse(bookingRequest.getEndDate()))
                 || checkDateInRange(bookingBefore.getEndDate(), LocalDate.parse(bookingRequest.getStartDate()), LocalDate.parse(bookingRequest.getEndDate())))) {
             throw new IllegalArgumentException("Car is already booked in that time");
@@ -62,8 +65,9 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public Booking getBookingByNo(String bookingNo) {
-        return bookingRepository.findByBookingNo(bookingNo).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+    public BookingDto getBookingDtoById(long bookingId) {
+        Booking booking = getBookingById(bookingId);
+        return mapper.mapBookingToDto(booking);
     }
 
     @Override
@@ -78,9 +82,9 @@ public class BookingServiceImpl implements BookingService {
     @Transactional
     public void bookingStatusHandle(Booking booking) {
         if (booking.getStatus() == BookingStatus.COMPLETED) {
-            Car car = carService.findById(booking.getCar().getId());
+            Car car = getCarById(booking.getCar().getId());
             Customer customer = getCustomerById(booking.getCustomer().getId());
-            CarOwner carOwner = carService.findCarOwnerByCarId(car.getId());
+            CarOwner carOwner = carOwnerRepository.findByCarId(booking.getCar().getId());
             customer.setWallet(customer.getWallet() - booking.getBill() + car.getDeposit());
             carOwner.setWallet(carOwner.getWallet() + booking.getBill());
             customerRepository.save(customer);
@@ -88,7 +92,7 @@ public class BookingServiceImpl implements BookingService {
         } else if (booking.getStatus() == BookingStatus.REJECTED) {
             deleteBooking(booking.getId());
         } else if (booking.getStatus() == BookingStatus.APPROVED) {
-            Car car = carService.findById(booking.getCar().getId());
+            Car car = getCarById(booking.getCar().getId());
             Customer customer = getCustomerById(booking.getCustomer().getId());
             customer.setWallet(customer.getWallet() - car.getDeposit());
             customerRepository.save(customer);
@@ -108,4 +112,28 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = getBookingById(bookingId);
         bookingRepository.delete(booking);
     }
+
+
+    @Override
+    public List<BookingDto> getBookingByCustomerId(long customerId) {
+        List<Booking> bookings = bookingRepository.findAllByCustomerIdAndStatus(customerId, BookingStatus.APPROVED);
+        if (bookings.isEmpty()) {
+            return null;
+        }
+        return bookings.stream().map(mapper::mapBookingToDto).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BookingDto> getBookingByCarId(long carId) {
+        List<Booking> bookings = bookingRepository.findAllByCarId(carId);
+        if (bookings.isEmpty()) {
+            return null;
+        }
+        return bookings.stream().map(mapper::mapBookingToDto).collect(Collectors.toList());
+    }
+
+    public Car getCarById(long carId) {
+        return carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+    }
+
 }

@@ -7,7 +7,7 @@ public class UrlMapping {
     public static final String REVIEW = API + "/review";
     public static final String GET_BY_ID = "/get/{id}";
     public static final String GET_ALL = "/get/all";
-    public static final String GET_BY_EMAIL = "/get/{email}";
+    public static final String GET_BY_EMAIL = "/get/email/{email}";
     public static final String UPDATE_BY_ID = "/update/{id}";
     public static final String DELETE_BY_ID = "/delete/{id}";
     public static final String REGISTER = "/register";

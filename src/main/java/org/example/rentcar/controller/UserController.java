@@ -20,8 +20,8 @@ import java.util.List;
 public class UserController {
     private final UserService userService;
     @GetMapping(UrlMapping.GET_BY_ID)
-    public ResponseEntity<APIResponse> getUserById(@PathVariable int id) {
-        User user = userService.getUserById(id);
+    public ResponseEntity<APIResponse> getUserById(@PathVariable long id) {
+        UserDto user = userService.getUserDetails(id);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.FOUND, user));
     }
 

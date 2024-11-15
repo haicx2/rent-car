@@ -26,7 +26,7 @@ public class CarController {
 
     @GetMapping(UrlMapping.GET_BY_ID)
     public ResponseEntity<APIResponse> getCarById(@PathVariable int id) {
-        Car car = carService.findById(id);
+        CarDto car = carService.getCarDetails(id);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.FOUND, car));
     }
 
@@ -39,7 +39,7 @@ public class CarController {
 
     @GetMapping(UrlMapping.GET_BY_OWNER_ID)
     public ResponseEntity<APIResponse> getAllCarByOwnerID(@PathVariable long ownerId) {
-        List<Car> cars = carService.findByOwnerId(ownerId);
+        List<CarDto> cars = carService.findByOwnerId(ownerId);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.FOUND, cars));
     }
 

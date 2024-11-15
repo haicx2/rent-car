@@ -1,24 +1,27 @@
 package org.example.rentcar.service.user;
 
 import lombok.RequiredArgsConstructor;
-import org.example.rentcar.dto.EntityConverter;
-import org.example.rentcar.dto.UserDto;
+import org.example.rentcar.config.Mapper;
+import org.example.rentcar.dto.*;
 import org.example.rentcar.exception.AlreadyExistException;
 import org.example.rentcar.exception.ResourceNotFoundException;
+import org.example.rentcar.model.Car;
 import org.example.rentcar.model.CarOwner;
 import org.example.rentcar.model.Customer;
 import org.example.rentcar.model.User;
-import org.example.rentcar.repository.CarOwnerRepository;
-import org.example.rentcar.repository.CustomerRepository;
-import org.example.rentcar.repository.UserRepository;
+import org.example.rentcar.repository.*;
 import org.example.rentcar.request.RegisterRequest;
 import org.example.rentcar.request.UpdateUserRequest;
+import org.example.rentcar.service.booking.BookingService;
+import org.example.rentcar.service.car.CarService;
+import org.example.rentcar.service.review.ReviewService;
 import org.example.rentcar.utils.FeedBackMessage;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -26,8 +29,12 @@ public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final CarOwnerRepository carOwnerRepository;
     private final CustomerRepository customerRepository;
+    private final ReviewService reviewService;
     private final ModelMapper modelMapper;
     private final EntityConverter<User, UserDto> userEntityConverter;
+    private final BookingService bookingService;
+    private final CarRepository carRepository;
+    private final Mapper mapper;
 
     @Override
     @Transactional
@@ -72,19 +79,44 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserById(long userId) {
-        return userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+        return userRepository
+                .findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
     }
 
     @Override
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
-        return users.stream().map(user -> userEntityConverter.mapEntityToDTO(user,UserDto.class)).toList();
+        return users.stream().map(user -> userEntityConverter
+                .mapEntityToDTO(user,UserDto.class))
+                .toList();
     }
 
     @Override
     public UserDto getUserDetails(long userId) {
         User user = getUserById(userId);
-        UserDto userDto = modelMapper.map(user, UserDto.class);
-        return null;
+        UserDto userDto = userEntityConverter.mapEntityToDTO(user,UserDto.class);
+        userDto.setBookingDtos(bookingService.getBookingByCustomerId(user.getId()));
+        userDto.setReviewDtos(reviewService.getReviewsByCustomerId(userId,0,5)
+                .getContent()
+                .stream()
+                .map(mapper::mapReviewToDto)
+                .collect(Collectors.toList())
+        );
+        if(user.getRole().equals("CUSTOMER")) {
+            userDto.setCarDtos(null);
+        } else {
+            List<Car> cars = carRepository.findAllByOwnerId(user.getId());
+            userDto.setCarDtos(cars.stream().map(car -> {
+                CarDto carDto = new CarDto();
+                carDto.setId(car.getId());
+                carDto.setName(car.getName());
+                carDto.setBrand(car.getBrand());
+                carDto.setOwnerEmail(car.getOwner().getEmail());
+                carDto.setLicensePlate(car.getLicensePlate());
+                return carDto;
+            }).collect(Collectors.toList()));
+        }
+        return userDto;
     }
 }
