@@ -13,16 +13,18 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin("http://localhost:5173/")
 @RestController
 @RequestMapping(UrlMapping.REVIEW)
 @RequiredArgsConstructor
 public class ReviewController {
     private final ReviewService reviewService;
+
     @PostMapping(UrlMapping.ADD)
     public ResponseEntity<APIResponse> createReview(@RequestBody ReviewRequest reviewRequest,
                                                     @RequestParam long customerId,
                                                     @RequestParam long carId) {
-        Review review = reviewService.saveReview(reviewRequest,customerId,carId);
+        Review review = reviewService.saveReview(reviewRequest, customerId, carId);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, review));
     }
 
@@ -42,7 +44,7 @@ public class ReviewController {
     public ResponseEntity<APIResponse> getReviewByCarId(@PathVariable long carId,
                                                         @RequestParam(defaultValue = "0") int size,
                                                         @RequestParam(defaultValue = "5") int page) {
-        Page<Review> reviews = reviewService.getReviewsByCarId(carId,size,page);
+        Page<Review> reviews = reviewService.getReviewsByCarId(carId, size, page);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.FOUND, reviews));
     }
 
@@ -50,7 +52,7 @@ public class ReviewController {
     public ResponseEntity<APIResponse> getReviewsByCustomerId(@PathVariable long customerId,
                                                               @RequestParam(defaultValue = "0") int size,
                                                               @RequestParam(defaultValue = "5") int page) {
-        Page<Review> reviews = reviewService.getReviewsByCustomerId(customerId,size,page);
+        Page<Review> reviews = reviewService.getReviewsByCustomerId(customerId, size, page);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.FOUND, reviews));
     }
 

@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin("http://localhost:5173/")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping(UrlMapping.USER)
 public class UserController {
     private final UserService userService;
+
     @GetMapping(UrlMapping.GET_BY_ID)
     public ResponseEntity<APIResponse> getUserById(@PathVariable long id) {
         UserDto user = userService.getUserDetails(id);
