@@ -6,10 +6,9 @@ import java.time.LocalDate;
 
 @Data
 public class RegisterRequest {
-    private long id;
     private Long nationalId;
     private String name;
-    private LocalDate birthday;
+    private String birthday;
     private String phone;
     private String email;
     private String password;

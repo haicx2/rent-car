@@ -20,6 +20,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,10 +47,12 @@ public class UserServiceImpl implements UserService {
         switch (registerRequest.getRole()) {
             case "OWNER" ->{
                 CarOwner user = modelMapper.map(registerRequest, CarOwner.class);
+                user.setBirthday(LocalDate.parse(registerRequest.getBirthday()));
                 return carOwnerRepository.save(user);
             }
             case "CUSTOMER" ->{
                 Customer user = modelMapper.map(registerRequest, Customer.class);
+                user.setBirthday(LocalDate.parse(registerRequest.getBirthday()));
                 return customerRepository.save(user);
             }
             default -> throw new ResourceNotFoundException("Invalid role");
