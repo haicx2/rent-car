@@ -86,6 +86,9 @@ public class CarServiceImpl implements CarService {
     @Override
     @Transactional
     public Car saveImage(long carId, MultipartFile file) throws IOException {
+        if (file == null || file.isEmpty()) {
+            throw new IllegalArgumentException("File cannot be null or empty");
+        }
         Car car = findById(carId);
         car.setImage(file.getBytes());
         return carRepository.save(car);

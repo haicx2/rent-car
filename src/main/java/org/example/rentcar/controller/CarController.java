@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.List;
 
-@CrossOrigin(value = "http://localhost:5173/", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE})
 @RestController
 @RequestMapping(UrlMapping.CAR)
 @RequiredArgsConstructor
@@ -57,10 +56,12 @@ public class CarController {
     }
 
     @PutMapping(UrlMapping.UPDATE_IMAGE_BY_ID)
-    public ResponseEntity<APIResponse> updateImageById(@PathVariable long carId, @RequestBody MultipartFile image) throws IOException {
-        Car car = carService.saveImage(carId, image);
+    public ResponseEntity<APIResponse> updateImageById(@PathVariable long carId, @RequestParam("file") MultipartFile file) throws IOException {
+        // Service handles errors, so you directly call the service here.
+        Car car = carService.saveImage(carId, file);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.UPDATE_SUCCESS, car));
     }
+
 
     @DeleteMapping(UrlMapping.DELETE_BY_ID)
     public ResponseEntity<APIResponse> deleteCarById(@PathVariable int id) {
