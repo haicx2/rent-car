@@ -5,10 +5,7 @@ import org.example.rentcar.config.Mapper;
 import org.example.rentcar.dto.BookingDto;
 import org.example.rentcar.enums.BookingStatus;
 import org.example.rentcar.exception.ResourceNotFoundException;
-import org.example.rentcar.model.Booking;
-import org.example.rentcar.model.Car;
-import org.example.rentcar.model.CarOwner;
-import org.example.rentcar.model.Customer;
+import org.example.rentcar.model.*;
 import org.example.rentcar.repository.BookingRepository;
 import org.example.rentcar.repository.CarOwnerRepository;
 import org.example.rentcar.repository.CarRepository;
@@ -134,25 +131,38 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public Booking approveBooking(long bookingId) {
-        return null;
+        Booking booking = getBookingById(bookingId);
+        booking.setStatus(BookingStatus.APPROVED);
+        return bookingRepository.save(booking);
     }
 
     @Override
     public Booking declineBooking(long bookingId) {
         Booking booking = getBookingById(bookingId);
         booking.setStatus(BookingStatus.REJECTED);
-        // cong lai coc
+        Customer customer = getCustomerById(booking.getCustomer().getId());
+        Car car = getCarById(booking.getCar().getId());
+        customer.setWallet(customer.getWallet() + car.getDeposit());
+        customerRepository.save(customer);
         return bookingRepository.save(booking);
     }
 
     @Override
     public Booking completeBooking(long bookingId) {
-        return null;
+        Booking booking = getBookingById(bookingId);
+        booking.setStatus(BookingStatus.COMPLETED);
+        Customer customer = getCustomerById(booking.getCustomer().getId());
+        Car car = getCarById(booking.getCar().getId());
+        customer.setWallet(customer.getWallet() - car.getBasePrice());
+        customerRepository.save(customer);
+        return bookingRepository.save(booking);
     }
 
     @Override
-    public Booking cancleBooking(long bookingId) {
-        return null;
+    public Booking cancelBooking(long bookingId) {
+        Booking booking = getBookingById(bookingId);
+        booking.setStatus(BookingStatus.CANCELED);
+        return bookingRepository.save(booking);
     }
 
     public Car getCarById(long carId) {

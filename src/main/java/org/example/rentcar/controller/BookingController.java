@@ -52,4 +52,27 @@ public class BookingController {
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.DELETE_SUCCESS,null));
     }
 
+    @PutMapping(UrlMapping.BOOKING_APPROVED)
+    public ResponseEntity<APIResponse> approvedBooking(@PathVariable long id) {
+        Booking booking = bookingService.approveBooking(id);
+        return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking.getId()));
+    }
+
+    @PutMapping(UrlMapping.BOOKING_REJECTED)
+    public ResponseEntity<APIResponse> declineBooking(@PathVariable long id) {
+        Booking booking = bookingService.declineBooking(id);
+        return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking.getId()));
+    }
+
+    @PutMapping(UrlMapping.BOOKING_COMPLETED)
+    public ResponseEntity<APIResponse> completeBooking(@PathVariable long id) {
+        Booking booking = bookingService.completeBooking(id);
+        return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking.getId()));
+    }
+
+    @PutMapping(UrlMapping.BOOKING_CANCELED)
+    public ResponseEntity<APIResponse> cancelBooking(@PathVariable long id) {
+        Booking booking = bookingService.cancelBooking(id);
+        return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking.getId()));
+    }
 }

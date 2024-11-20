@@ -19,5 +19,5 @@ public interface BookingService {
     Booking approveBooking(long bookingId);
     Booking declineBooking(long bookingId);
     Booking completeBooking(long bookingId);
-    Booking cancleBooking(long bookingId);
+    Booking cancelBooking(long bookingId);
 }
