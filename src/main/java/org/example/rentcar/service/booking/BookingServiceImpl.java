@@ -132,6 +132,29 @@ public class BookingServiceImpl implements BookingService {
         return bookings.stream().map(mapper::mapBookingToDto).collect(Collectors.toList());
     }
 
+    @Override
+    public Booking approveBooking(long bookingId) {
+        return null;
+    }
+
+    @Override
+    public Booking declineBooking(long bookingId) {
+        Booking booking = getBookingById(bookingId);
+        booking.setStatus(BookingStatus.REJECTED);
+        // cong lai coc
+        return bookingRepository.save(booking);
+    }
+
+    @Override
+    public Booking completeBooking(long bookingId) {
+        return null;
+    }
+
+    @Override
+    public Booking cancleBooking(long bookingId) {
+        return null;
+    }
+
     public Car getCarById(long carId) {
         return carRepository.findById(carId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
     }

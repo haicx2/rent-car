@@ -16,4 +16,8 @@ public interface BookingService {
     void deleteBooking(long bookingId);
     List<BookingDto> getBookingByCustomerId(long customerId);
     List<BookingDto> getBookingByCarId(long carId);
+    Booking approveBooking(long bookingId);
+    Booking declineBooking(long bookingId);
+    Booking completeBooking(long bookingId);
+    Booking cancleBooking(long bookingId);
 }

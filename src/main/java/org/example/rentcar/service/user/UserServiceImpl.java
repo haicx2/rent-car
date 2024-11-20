@@ -70,6 +70,7 @@ public class UserServiceImpl implements UserService {
     public User updateUserById(long userId, UpdateUserRequest updateRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
         modelMapper.map(updateRequest, user);
+        user.setBirthday(LocalDate.parse(updateRequest.getBirthday()));
         return userRepository.save(user);
     }
 
