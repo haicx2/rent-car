@@ -53,26 +53,26 @@ public class BookingController {
     }
 
     @PutMapping(UrlMapping.BOOKING_APPROVED)
-    public ResponseEntity<APIResponse> approvedBooking(@PathVariable long id) {
-        Booking booking = bookingService.approveBooking(id);
+    public ResponseEntity<APIResponse> approvedBooking(@PathVariable long bookingId) {
+        Booking booking = bookingService.approveBooking(bookingId);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking.getId()));
     }
 
     @PutMapping(UrlMapping.BOOKING_REJECTED)
-    public ResponseEntity<APIResponse> declineBooking(@PathVariable long id) {
-        Booking booking = bookingService.declineBooking(id);
+    public ResponseEntity<APIResponse> declineBooking(@PathVariable long bookingId) {
+        Booking booking = bookingService.declineBooking(bookingId);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking.getId()));
     }
 
     @PutMapping(UrlMapping.BOOKING_COMPLETED)
-    public ResponseEntity<APIResponse> completeBooking(@PathVariable long id) {
-        Booking booking = bookingService.completeBooking(id);
+    public ResponseEntity<APIResponse> completeBooking(@PathVariable long bookingId) {
+        Booking booking = bookingService.completeBooking(bookingId);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking.getId()));
     }
 
     @PutMapping(UrlMapping.BOOKING_CANCELED)
-    public ResponseEntity<APIResponse> cancelBooking(@PathVariable long id) {
-        Booking booking = bookingService.cancelBooking(id);
+    public ResponseEntity<APIResponse> cancelBooking(@PathVariable long bookingId) {
+        Booking booking = bookingService.cancelBooking(bookingId);
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking.getId()));
     }
 }

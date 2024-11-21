@@ -17,6 +17,7 @@ public class CarDto {
     private String name;
     private String licensePlate;
     private String brand;
+    private String description;
     private byte[] image;
     private String ownerEmail;
     private double averageRating;

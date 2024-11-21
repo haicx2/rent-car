@@ -100,7 +100,11 @@ public class UserServiceImpl implements UserService {
     public UserDto getUserDetails(long userId) {
         User user = getUserById(userId);
         UserDto userDto = userEntityConverter.mapEntityToDTO(user,UserDto.class);
-        userDto.setBookingDtos(bookingService.getBookingByCustomerId(user.getId()));
+        if(user.getRole().equals("CUSTOMER")){
+            userDto.setBookingDtos(bookingService.getBookingByCustomerId(user.getId()));
+        }else {
+            userDto.setBookingDtos(bookingService.getBookingByOwnerId(user.getId()));
+        }
         userDto.setReviewDtos(reviewService.getReviewsByCustomerId(userId,0,5)
                 .getContent()
                 .stream()

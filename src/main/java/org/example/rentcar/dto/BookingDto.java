@@ -18,6 +18,8 @@ public class BookingDto {
     private LocalDate startDate;
     private LocalDate endDate;
     private String customerName;
+    private long customerId;
+    private long carId;
     private String carName;
     private String paymentMethod = "WALLET";
     private BookingStatus status;

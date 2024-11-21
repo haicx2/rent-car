@@ -20,4 +20,5 @@ public interface BookingService {
     Booking declineBooking(long bookingId);
     Booking completeBooking(long bookingId);
     Booking cancelBooking(long bookingId);
+    List<BookingDto> getBookingByOwnerId(long ownerId);
 }

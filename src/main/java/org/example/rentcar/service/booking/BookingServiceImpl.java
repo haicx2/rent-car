@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -163,6 +164,20 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = getBookingById(bookingId);
         booking.setStatus(BookingStatus.CANCELED);
         return bookingRepository.save(booking);
+    }
+
+    @Override
+    public List<BookingDto> getBookingByOwnerId(long ownerId) {
+        CarOwner owner = carOwnerRepository.findById(ownerId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+        if (owner.getCars().isEmpty()){
+            return null;
+        }
+        List<BookingDto> bookingDtos = new ArrayList<>();
+        for(Car car : owner.getCars()){
+            List<BookingDto> bookingDtos1 = getBookingByCarId(car.getId());
+            bookingDtos.addAll(bookingDtos1);
+        }
+        return bookingDtos;
     }
 
     public Car getCarById(long carId) {
