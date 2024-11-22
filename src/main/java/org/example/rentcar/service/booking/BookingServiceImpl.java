@@ -114,7 +114,7 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getBookingByCustomerId(long customerId) {
-        List<Booking> bookings = bookingRepository.findAllByCustomerIdAndStatus(customerId, BookingStatus.APPROVED);
+        List<Booking> bookings = bookingRepository.findAllByCustomerId(customerId);
         if (bookings.isEmpty()) {
             return null;
         }
@@ -153,8 +153,7 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = getBookingById(bookingId);
         booking.setStatus(BookingStatus.COMPLETED);
         Customer customer = getCustomerById(booking.getCustomer().getId());
-        Car car = getCarById(booking.getCar().getId());
-        customer.setWallet(customer.getWallet() - car.getBasePrice());
+        customer.setWallet(customer.getWallet() - booking.getBill());
         customerRepository.save(customer);
         return bookingRepository.save(booking);
     }
