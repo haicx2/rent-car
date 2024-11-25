@@ -21,34 +21,39 @@ import java.io.IOException;
 @NoArgsConstructor
 public class AuthTokenFilter extends OncePerRequestFilter {
     private JwtUtils jwtUtils;
-    UPCUserDetailsService upcUserDetailsService;
+    private UPCUserDetailsService upcUserDetailsService;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
         try {
-            String jwt = parseJwt(request);
+            String jwt = parseJwt(request); // Extract JWT from the header
             if (StringUtils.hasText(jwt) && jwtUtils.validateToken(jwt)) {
                 String email = jwtUtils.getUserNameFromToken(jwt);
+
+                // Load user details and set authentication
                 UserDetails userDetails = upcUserDetailsService.loadUserByUsername(email);
-                var authentication =
-                        new UsernamePasswordAuthenticationToken(userDetails,
-                                null,
-                                userDetails.getAuthorities());
+                var authentication = new UsernamePasswordAuthenticationToken(
+                        userDetails, null, userDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
         } catch (Exception e) {
-            throw new ServletException(e.getMessage());
+            // Log the exception for debugging
+            System.err.println("Authentication error: " + e.getMessage());
         }
+
+        // Continue the filter chain even if authentication fails
+        filterChain.doFilter(request, response);
     }
 
     private String parseJwt(HttpServletRequest request) {
         String headAuth = request.getHeader("Authorization");
-        if (StringUtils.hasText(headAuth) && headAuth.startsWith("Bearer ")){
-            return headAuth.substring(7);
+        if (StringUtils.hasText(headAuth) && headAuth.startsWith("Bearer ")) {
+            return headAuth.substring(7); // Extract the token part
         }
-        return null;
+        return null; // No token found
     }
 }
