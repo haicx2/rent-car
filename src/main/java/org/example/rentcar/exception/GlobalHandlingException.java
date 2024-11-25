@@ -1,8 +1,10 @@
 package org.example.rentcar.exception;
 
+import io.jsonwebtoken.JwtException;
 import org.example.rentcar.response.APIResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -44,5 +46,15 @@ public class GlobalHandlingException {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<APIResponse> handleIllegalArgumentException(IllegalArgumentException ex) {
         return ResponseEntity.status(HttpStatus.NOT_ACCEPTABLE).body(new APIResponse(ex.getMessage(),null));
+    }
+
+    @ExceptionHandler(UsernameNotFoundException.class)
+    public ResponseEntity<APIResponse> handleIllegalArgumentException(UsernameNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new APIResponse(ex.getMessage(),null));
+    }
+
+    @ExceptionHandler(JwtException.class)
+    public ResponseEntity<APIResponse> handleIllegalArgumentException(JwtException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new APIResponse(ex.getMessage(),null));
     }
 }

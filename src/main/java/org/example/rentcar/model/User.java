@@ -9,6 +9,8 @@ import lombok.Setter;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 @Getter
@@ -32,6 +34,15 @@ public class User {
     private String drivingLicense;
     private double wallet;
     private String role;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.PERSIST,
+            CascadeType.MERGE, CascadeType.REFRESH})
+    @JoinTable(name = "user_roles",
+            joinColumns = @JoinColumn(name = "user_id",
+            referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id",
+    referencedColumnName = "id"))
+    private Collection<Role> roles = new HashSet<>();
     @Transient
     List<Review> reviews = new ArrayList<>();
+
 }
