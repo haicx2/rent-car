@@ -34,6 +34,7 @@ public class User {
     private String drivingLicense;
     private double wallet;
     private String role;
+    private boolean isEnabled;
 
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.DETACH, CascadeType.PERSIST,
             CascadeType.MERGE, CascadeType.REFRESH})

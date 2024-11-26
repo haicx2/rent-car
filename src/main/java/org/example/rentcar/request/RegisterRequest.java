@@ -16,4 +16,5 @@ public class RegisterRequest {
     private String drivingLicense;
     private double wallet;
     private String role;
+    private boolean isEnabled;
 }

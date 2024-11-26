@@ -49,12 +49,12 @@ public class GlobalHandlingException {
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
-    public ResponseEntity<APIResponse> handleIllegalArgumentException(UsernameNotFoundException ex) {
+    public ResponseEntity<APIResponse> handleUsernameNotFoundException(UsernameNotFoundException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new APIResponse(ex.getMessage(),null));
     }
 
     @ExceptionHandler(JwtException.class)
-    public ResponseEntity<APIResponse> handleIllegalArgumentException(JwtException ex) {
+    public ResponseEntity<APIResponse> handleJwtException(JwtException ex) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new APIResponse(ex.getMessage(),null));
     }
 }

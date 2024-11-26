@@ -16,7 +16,7 @@ public class UPCUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        User user = userRepository.getUserByEmail(email)
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new UsernameNotFoundException(FeedBackMessage.NOT_FOUND));
         return UPCUserDetails.buildUserDetails(user);
     }

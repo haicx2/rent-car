@@ -21,10 +21,12 @@ public class UPCUserDetails implements UserDetails {
     private Long id;
     private String email;
     private String password;
+    private boolean isEnabled;
+
     private Collection<GrantedAuthority> authorities;
 
     public static UPCUserDetails buildUserDetails(User user) {
-        List<GrantedAuthority> authorities1 = user.getRoles()
+        List<GrantedAuthority> authorities = user.getRoles()
                 .stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName()))
                 .collect(Collectors.toList());
@@ -32,8 +34,8 @@ public class UPCUserDetails implements UserDetails {
                 user.getId(),
                 user.getEmail(),
                 user.getPassword(),
-                authorities1
-        );
+                user.isEnabled(),
+                authorities);
     }
 
     @Override
@@ -63,11 +65,11 @@ public class UPCUserDetails implements UserDetails {
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return true;
+        return isEnabled;
     }
 }

@@ -22,4 +22,6 @@ public class UrlMapping {
     public static final String BOOKING_CANCELED = "/{bookingId}/cancel";
     public static final String BOOKING_COMPLETED = "/{bookingId}/complete";
     public static final String BOOKING_REJECTED = "/{bookingId}/reject";
+    public static final String LOGIN = "/login";
+    public static final String AUTH = API + "/auth";
 }

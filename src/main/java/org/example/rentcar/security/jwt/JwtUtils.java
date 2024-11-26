@@ -15,23 +15,25 @@ import java.util.List;
 
 @Component
 public class JwtUtils {
+
     @Value("${auth.token.jwtSecret}")
     private String jwtSecret;
     @Value("${auth.token.expirationInMils}")
     private int jwtExpirationMs;
 
-    public String generateTokenUser(Authentication authentication) {
+    public String generateTokenForUser(Authentication authentication) {
         UPCUserDetails userPrincipal = (UPCUserDetails) authentication.getPrincipal();
+
         List<String> roles = userPrincipal.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
+                .stream().map(GrantedAuthority::getAuthority)
                 .toList();
+
         return Jwts.builder()
                 .setSubject(userPrincipal.getUsername())
                 .claim("id", userPrincipal.getId())
                 .claim("roles", roles)
                 .setIssuedAt(new Date())
-                .setExpiration(new Date((new Date()).getTime() + jwtExpirationMs))
+                .setExpiration(new Date((new Date()).getTime()+jwtExpirationMs))
                 .signWith(key(), SignatureAlgorithm.HS256).compact();
     }
 
@@ -39,19 +41,20 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(Decoders.BASE64.decode(jwtSecret));
     }
 
-    public String getUserNameFromToken(String token) {
+
+    public String getUserNameFromToken(String token){
         return Jwts.parserBuilder()
                 .setSigningKey(key())
                 .build()
                 .parseClaimsJws(token).getBody().getSubject();
     }
-
-    public boolean validateToken(String token) {
-        try {
+    public boolean validateToken(String token){
+        try{
             Jwts.parserBuilder().setSigningKey(key()).build().parse(token);
             return true;
-        } catch (MalformedJwtException | IllegalArgumentException | UnsupportedJwtException | ExpiredJwtException e) {
+        }catch(MalformedJwtException | IllegalArgumentException | UnsupportedJwtException | ExpiredJwtException e){
             throw new JwtException(e.getMessage());
         }
+
     }
 }

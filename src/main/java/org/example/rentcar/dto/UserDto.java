@@ -17,6 +17,7 @@ public class UserDto {
     private String drivingLicense;
     private double wallet;
     private String role;
+    private boolean isEnabled;
     List<ReviewDto> reviewDtos;
     List<BookingDto> bookingDtos;
     List<CarDto> carDtos;
