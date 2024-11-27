@@ -1,7 +1,9 @@
 package org.example.rentcar.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.rentcar.dto.EntityConverter;
 import org.example.rentcar.dto.UserDto;
+import org.example.rentcar.event.RegistrationCompleteEvent;
 import org.example.rentcar.exception.ResourceNotFoundException;
 import org.example.rentcar.model.User;
 import org.example.rentcar.request.ChangePasswordRequest;
@@ -12,6 +14,7 @@ import org.example.rentcar.service.password.ChangePasswordService;
 import org.example.rentcar.service.user.UserService;
 import org.example.rentcar.utils.FeedBackMessage;
 import org.example.rentcar.utils.UrlMapping;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +28,9 @@ import static org.springframework.http.HttpStatus.NOT_FOUND;
 @RequestMapping(UrlMapping.USER)
 public class UserController {
     private final UserService userService;
+    private final EntityConverter<User, UserDto> userEntityConverter;
     private final ChangePasswordService changePasswordService;
+    private final ApplicationEventPublisher applicationEventPublisher;
     @GetMapping(UrlMapping.GET_BY_ID)
     public ResponseEntity<APIResponse> getUserById(@PathVariable long id) {
         UserDto user = userService.getUserDetails(id);
@@ -35,13 +40,16 @@ public class UserController {
     @PostMapping(UrlMapping.REGISTER)
     public ResponseEntity<APIResponse> registerUser(@RequestBody RegisterRequest registerRequest) {
         User user = userService.createUser(registerRequest);
-        return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, user));
+        applicationEventPublisher.publishEvent(new RegistrationCompleteEvent(user));
+        UserDto userDto = userEntityConverter.mapEntityToDTO(user, UserDto.class);
+        return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, userDto));
     }
 
     @PutMapping(UrlMapping.UPDATE_BY_ID)
     public ResponseEntity<APIResponse> updateUserById(@PathVariable int id, @RequestBody UpdateUserRequest updateUserRequest) {
         User user = userService.updateUserById(id, updateUserRequest);
-        return ResponseEntity.ok(new APIResponse(FeedBackMessage.UPDATE_SUCCESS, user));
+        UserDto userDto = userEntityConverter.mapEntityToDTO(user, UserDto.class);
+        return ResponseEntity.ok(new APIResponse(FeedBackMessage.UPDATE_SUCCESS, userDto));
     }
 
     @DeleteMapping(UrlMapping.DELETE_BY_ID)

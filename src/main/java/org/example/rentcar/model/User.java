@@ -43,7 +43,10 @@ public class User {
             referencedColumnName = "id"), inverseJoinColumns = @JoinColumn(name = "role_id",
     referencedColumnName = "id"))
     private Collection<Role> roles = new HashSet<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
+    private List<VerificationToken> verificationTokens = new ArrayList<>();
     @Transient
     List<Review> reviews = new ArrayList<>();
+
 
 }

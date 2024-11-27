@@ -17,6 +17,7 @@ import org.example.rentcar.service.car.CarService;
 import org.example.rentcar.service.review.ReviewService;
 import org.example.rentcar.utils.FeedBackMessage;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +37,7 @@ public class UserServiceImpl implements UserService {
     private final BookingService bookingService;
     private final CarRepository carRepository;
     private final Mapper mapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -43,7 +45,7 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new AlreadyExistException("Email already exists");
         }
-
+        registerRequest.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         switch (registerRequest.getRole()) {
             case "OWNER" ->{
                 CarOwner user = modelMapper.map(registerRequest, CarOwner.class);
