@@ -10,6 +10,7 @@ public class FeedBackMessage {
     public static final String ALREADY_EXISTS = "Resource already exists";
     public static final String AUTHENTICATION_SUCCESS = "Authentication successful";
     public static final String USER_FOUND = "User found";
+    public static final String ERROR = "Error occurred" ;
     /*======================== Start Token API =====================================*/
     public static final String INVALID_TOKEN = "INVALID";
     public static final String TOKEN_ALREADY_VERIFIED = "VERIFIED";
@@ -22,6 +23,10 @@ public class FeedBackMessage {
     public static final String NEW_VERIFICATION_TOKEN_SENT = "A new verification link has been sent to your email. Please check to complete your registration.";
     public static final String NO_USER_FOUND = "No User Found.";
     public static final String PASSWORD_RESET_SUCCESS = "Password reset successfully.";
+    public static final String MISSING_PASSWORD = "Missing password.";
+    public static final String INVALID_RESET_TOKEN = "Invalid token";
+    public static final String INVALID_EMAIL = "Invalid email.";
+    public static final String PASSWORD_RESET_EMAIL_SENT = "Password reset email sent";
     /*======================== End Token API =====================================*/
 
 }

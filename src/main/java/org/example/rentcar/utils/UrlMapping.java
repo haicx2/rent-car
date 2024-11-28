@@ -17,7 +17,6 @@ public class UrlMapping {
     public static final String BOOKING = API + "/booking";
     public static final String GET_BY_CUSTOMER_ID = "/get/{customerId}";
     public static final String GET_BY_CAR_ID = "/get/{carId}";
-    public static final String CHANGE_PASSWORD = "/{userId}/change-password";
     public static final String BOOKING_APPROVED = "/{bookingId}/approve";
     public static final String BOOKING_CANCELED = "/{bookingId}/cancel";
     public static final String BOOKING_COMPLETED = "/{bookingId}/complete";
@@ -34,4 +33,7 @@ public class UrlMapping {
     public static final String VERIFY_EMAIL = "/verify-your-email";
     public static final String RESEND_VERIFICATION_TOKEN = "/resend-verification-token";
     /*============================ End verification token ===================================*/
+    public static final String REQUEST_PASSWORD_RESET = "/request-password-reset" ;
+    public static final String RESET_PASSWORD = "/reset-password" ;
+    public static final String CHANGE_PASSWORD = "/user/{userId}/change-password";
 }
