@@ -20,6 +20,8 @@ public class FeedBackMessage {
     public static final String TOKEN_DELETE_SUCCESS = "User token deleted successfully";
     public static final String INVALID_VERIFICATION_TOKEN = "Invalid verification token";
     public static final String NEW_VERIFICATION_TOKEN_SENT = "A new verification link has been sent to your email. Please check to complete your registration.";
+    public static final String NO_USER_FOUND = "No User Found.";
+    public static final String PASSWORD_RESET_SUCCESS = "Password reset successfully.";
     /*======================== End Token API =====================================*/
 
 }
