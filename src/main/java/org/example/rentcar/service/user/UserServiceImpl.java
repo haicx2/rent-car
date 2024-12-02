@@ -15,6 +15,7 @@ import org.example.rentcar.request.UpdateUserRequest;
 import org.example.rentcar.service.booking.BookingService;
 import org.example.rentcar.service.car.CarService;
 import org.example.rentcar.service.review.ReviewService;
+import org.example.rentcar.service.role.RoleService;
 import org.example.rentcar.utils.FeedBackMessage;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -38,6 +39,7 @@ public class UserServiceImpl implements UserService {
     private final CarRepository carRepository;
     private final Mapper mapper;
     private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
 
     @Override
     @Transactional
@@ -50,11 +52,13 @@ public class UserServiceImpl implements UserService {
             case "OWNER" ->{
                 CarOwner user = modelMapper.map(registerRequest, CarOwner.class);
                 user.setBirthday(LocalDate.parse(registerRequest.getBirthday()));
+                user.setRoles(roleService.setUserRole("OWNER"));
                 return carOwnerRepository.save(user);
             }
             case "CUSTOMER" ->{
                 Customer user = modelMapper.map(registerRequest, Customer.class);
                 user.setBirthday(LocalDate.parse(registerRequest.getBirthday()));
+                user.setRoles(roleService.setUserRole("CUSTOMER"));
                 return customerRepository.save(user);
             }
             default -> throw new ResourceNotFoundException("Invalid role");

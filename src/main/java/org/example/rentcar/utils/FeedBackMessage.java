@@ -27,6 +27,7 @@ public class FeedBackMessage {
     public static final String INVALID_RESET_TOKEN = "Invalid token";
     public static final String INVALID_EMAIL = "Invalid email.";
     public static final String PASSWORD_RESET_EMAIL_SENT = "Password reset email sent";
+    public static final String ROLE_NOT_FOUND = "Role not found";
     /*======================== End Token API =====================================*/
 
 }
