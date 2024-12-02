@@ -90,12 +90,12 @@ public class NotificationEventListener implements ApplicationListener<Applicatio
 
     private void sendRegistrationVerificationEmail(User user, String url) throws MessagingException, UnsupportedEncodingException {
         String subject = "Verify Your Email";
-        String senderName = "Booking Car Service";  // Changed here
+        String senderName = "Auto quest Service";  // Changed here
         String mailContent = "<p> Hi, " + user.getName() + ", </p>" +
                 "<p>Thank you for registering with us," +
                 "Please, follow the link below to complete your registration.</p>" +
                 "<a href=\"" + url + "\">Verify your email</a>" +
-                "<p> Thank you <br> Booking Car Email Verification Service";  // Changed here
+                "<p> Thank you <br> Booking Car Email Verification Service</p>";  // Changed here
         emailService.sendEmail(user.getEmail(), subject, senderName, mailContent);
     }
     /*=================== End user registration email verification ============================*/
@@ -109,12 +109,12 @@ public class NotificationEventListener implements ApplicationListener<Applicatio
 
     private void sendAppointmentApprovedNotification(User user, String url) throws MessagingException, UnsupportedEncodingException {
         String subject = "Booking Approved";  // Changed here
-        String senderName = "Booking Car Notification Service";  // Changed here
+        String senderName = "Auto quest Service";  // Changed here
         String mailContent = "<p> Hi, " + user.getName() + ", </p>" +
                 "<p>Your booking has been approved:</p>" +
                 "<a href=\"" + url + "\">Please, check the booking portal to view booking details " +
                 "and car information.</a> <br/>" +
-                "<p> Best Regards.<br> Booking Car Service";  // Changed here
+                "<p> Best Regards.<br> Booking Car Service</p>";  // Changed here
         emailService.sendEmail(user.getEmail(), subject, senderName, mailContent);
     }
     /*======================== End Approve Appointment notifications ===================================================*/
@@ -130,12 +130,12 @@ public class NotificationEventListener implements ApplicationListener<Applicatio
 
     private void sendAppointmentDeclinedNotification(User user, String url) throws MessagingException, UnsupportedEncodingException {
         String subject = "Booking Not Approved";  // Changed here
-        String senderName = "Booking Car Notification Service";  // Changed here
+        String senderName = "Auto quest Service";  // Changed here
         String mailContent = "<p> Hi, " + user.getName() + ", </p>" +
                 "<p>We are sorry, your booking was not approved at this time,<br/> " +
                 "Please, kindly make a new booking for another date. Thanks</p>" +
                 "<a href=\"" + url + "\">Please, check the booking portal to view booking details.</a> <br/>" +
-                "<p> Best Regards.<br> Booking Car Service";  // Changed here
+                "<p> Best Regards.<br> Booking Car Service</p>";  // Changed here
         emailService.sendEmail(user.getEmail(), subject, senderName, mailContent);
     }
     /*======================== End Decline Appointment notifications ===================================================*/
@@ -145,17 +145,18 @@ public class NotificationEventListener implements ApplicationListener<Applicatio
         Booking booking = event.getBooking();
         User customer = booking.getCustomer();
         User owner = booking.getCar().getOwner();
-        sendBookingCompletedNotification(customer, frontendBaseUrl);
-        sendBookingCompletedNotification(owner, frontendBaseUrl);
+        sendBookingCompletedNotification(customer, booking, frontendBaseUrl);
+        sendBookingCompletedNotification(owner, booking, frontendBaseUrl);
     }
 
-    private void sendBookingCompletedNotification(User user, String url) throws MessagingException, UnsupportedEncodingException {
-        String subject = "New Booking Notification";  // Changed here
-        String senderName = "Booking Car Service";  // Changed here
+    private void sendBookingCompletedNotification(User user, Booking booking, String url) throws MessagingException, UnsupportedEncodingException {
+        String subject = "Complete Booking Notification";  // Changed here
+        String senderName = "Auto quest Service";  // Changed here
         String mailContent = "<p> Hi, " + user.getName() + ", </p>" +
-                "<p>You have a new booking:</p>" +
+                "<p>You have complete a booking:</p>" +
                 "<a href=\"" + url + "\">Please, check the booking portal to view booking details.</a> <br/>" +
-                "<p> Best Regards.<br> Booking Car Service";  // Changed here
+                "<p>Here is your bill: " + booking.getBill() + "</p>" +
+                "<p> Best Regards.<br> Booking Car Service</p>";  // Changed here
         emailService.sendEmail(user.getEmail(), subject, senderName, mailContent);
     }
     /*======================== End New Booking notifications ===================================================*/
