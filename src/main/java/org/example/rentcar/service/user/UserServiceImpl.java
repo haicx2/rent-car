@@ -5,10 +5,7 @@ import org.example.rentcar.config.Mapper;
 import org.example.rentcar.dto.*;
 import org.example.rentcar.exception.AlreadyExistException;
 import org.example.rentcar.exception.ResourceNotFoundException;
-import org.example.rentcar.model.Car;
-import org.example.rentcar.model.CarOwner;
-import org.example.rentcar.model.Customer;
-import org.example.rentcar.model.User;
+import org.example.rentcar.model.*;
 import org.example.rentcar.repository.*;
 import org.example.rentcar.request.RegisterRequest;
 import org.example.rentcar.request.UpdateUserRequest;
@@ -23,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,6 +38,8 @@ public class UserServiceImpl implements UserService {
     private final Mapper mapper;
     private final PasswordEncoder passwordEncoder;
     private final RoleService roleService;
+    private final ReviewRepository reviewRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     @Transactional
@@ -75,16 +75,38 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public User updateUserById(long userId, UpdateUserRequest updateRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
-        modelMapper.map(updateRequest, user);
-        user.setBirthday(LocalDate.parse(updateRequest.getBirthday()));
+        user.setName(updateRequest.getName());
+        user.setNationalId(updateRequest.getNationalId());
+        user.setPhone(updateRequest.getPhone());
+        user.setAddress(updateRequest.getAddress());
+        user.setDrivingLicense(updateRequest.getDrivingLicense());
         return userRepository.save(user);
     }
 
     @Override
     @Transactional
     public void deleteUserById(long userId) {
-        User user = getUserById(userId);
-        userRepository.delete(user);
+        userRepository.findById(userId).ifPresentOrElse(userToDelete -> {
+            if(userToDelete.getRole().equals("CUSTOMER")) {
+                List<Review> reviews = new ArrayList<>(reviewRepository.findAllByCustomerId1(userId));
+                reviewRepository.deleteAll(reviews);
+                List<Booking> bookings = new ArrayList<>(bookingRepository.findAllByCustomerId(userId));
+                bookingRepository.deleteAll(bookings);
+            }
+            if(userToDelete.getRole().equals("OWNER")) {
+                List<Car> cars = new ArrayList<>(carRepository.findAllByOwnerId(userId));
+                carRepository.deleteAll(cars);
+                List<Booking> bookings = new ArrayList<>();
+                for (Car car : cars) {
+                    List<Booking> carBookings = new ArrayList<>(bookingRepository.findAllByCarId(car.getId()));
+                    bookings.addAll(carBookings);
+                }
+                bookingRepository.deleteAll(bookings);
+            }
+            userRepository.deleteById(userId);
+        }, () -> {
+            throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);
+        });
     }
 
     @Override

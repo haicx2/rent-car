@@ -31,7 +31,7 @@ public class ApplicationSecurityConfig {
     private final JwtAuthEntryPoint authEntryPoint;
 
     private static final List<String> SECURED_URLS = List.of(
-            "/api/v1/booking/**",
+            "/api/v1/booking/add/**",
             "/api/v1/review/**"
     );
 
