@@ -8,7 +8,6 @@ import java.time.LocalDate;
 public class UpdateUserRequest {
     private Long nationalId;
     private String name;
-    private String birthday;
     private String phone;
     private String address;
     private String drivingLicense;

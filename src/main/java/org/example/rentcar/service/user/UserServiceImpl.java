@@ -5,22 +5,22 @@ import org.example.rentcar.config.Mapper;
 import org.example.rentcar.dto.*;
 import org.example.rentcar.exception.AlreadyExistException;
 import org.example.rentcar.exception.ResourceNotFoundException;
-import org.example.rentcar.model.Car;
-import org.example.rentcar.model.CarOwner;
-import org.example.rentcar.model.Customer;
-import org.example.rentcar.model.User;
+import org.example.rentcar.model.*;
 import org.example.rentcar.repository.*;
 import org.example.rentcar.request.RegisterRequest;
 import org.example.rentcar.request.UpdateUserRequest;
 import org.example.rentcar.service.booking.BookingService;
 import org.example.rentcar.service.car.CarService;
 import org.example.rentcar.service.review.ReviewService;
+import org.example.rentcar.service.role.RoleService;
 import org.example.rentcar.utils.FeedBackMessage;
 import org.modelmapper.ModelMapper;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,6 +36,10 @@ public class UserServiceImpl implements UserService {
     private final BookingService bookingService;
     private final CarRepository carRepository;
     private final Mapper mapper;
+    private final PasswordEncoder passwordEncoder;
+    private final RoleService roleService;
+    private final ReviewRepository reviewRepository;
+    private final BookingRepository bookingRepository;
 
     @Override
     @Transactional
@@ -43,16 +47,18 @@ public class UserServiceImpl implements UserService {
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             throw new AlreadyExistException("Email already exists");
         }
-
+        registerRequest.setPassword(passwordEncoder.encode(registerRequest.getPassword()));
         switch (registerRequest.getRole()) {
             case "OWNER" ->{
                 CarOwner user = modelMapper.map(registerRequest, CarOwner.class);
                 user.setBirthday(LocalDate.parse(registerRequest.getBirthday()));
+                user.setRoles(roleService.setUserRole("OWNER"));
                 return carOwnerRepository.save(user);
             }
             case "CUSTOMER" ->{
                 Customer user = modelMapper.map(registerRequest, Customer.class);
                 user.setBirthday(LocalDate.parse(registerRequest.getBirthday()));
+                user.setRoles(roleService.setUserRole("CUSTOMER"));
                 return customerRepository.save(user);
             }
             default -> throw new ResourceNotFoundException("Invalid role");
@@ -62,23 +68,45 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User getUserByEmail(String email) {
-        return userRepository.getUserByEmail(email).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.FOUND));
+        return userRepository.findByEmail(email).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.FOUND));
     }
 
     @Override
     @Transactional
     public User updateUserById(long userId, UpdateUserRequest updateRequest) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
-        modelMapper.map(updateRequest, user);
-        user.setBirthday(LocalDate.parse(updateRequest.getBirthday()));
+        user.setName(updateRequest.getName());
+        user.setNationalId(updateRequest.getNationalId());
+        user.setPhone(updateRequest.getPhone());
+        user.setAddress(updateRequest.getAddress());
+        user.setDrivingLicense(updateRequest.getDrivingLicense());
         return userRepository.save(user);
     }
 
     @Override
     @Transactional
     public void deleteUserById(long userId) {
-        User user = getUserById(userId);
-        userRepository.delete(user);
+        userRepository.findById(userId).ifPresentOrElse(userToDelete -> {
+            if(userToDelete.getRole().equals("CUSTOMER")) {
+                List<Review> reviews = new ArrayList<>(reviewRepository.findAllByCustomerId1(userId));
+                reviewRepository.deleteAll(reviews);
+                List<Booking> bookings = new ArrayList<>(bookingRepository.findAllByCustomerId(userId));
+                bookingRepository.deleteAll(bookings);
+            }
+            if(userToDelete.getRole().equals("OWNER")) {
+                List<Car> cars = new ArrayList<>(carRepository.findAllByOwnerId(userId));
+                carRepository.deleteAll(cars);
+                List<Booking> bookings = new ArrayList<>();
+                for (Car car : cars) {
+                    List<Booking> carBookings = new ArrayList<>(bookingRepository.findAllByCarId(car.getId()));
+                    bookings.addAll(carBookings);
+                }
+                bookingRepository.deleteAll(bookings);
+            }
+            userRepository.deleteById(userId);
+        }, () -> {
+            throw new ResourceNotFoundException(FeedBackMessage.NOT_FOUND);
+        });
     }
 
     @Override

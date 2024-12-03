@@ -2,6 +2,9 @@ package org.example.rentcar.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.rentcar.dto.BookingDto;
+import org.example.rentcar.event.BookingApprovedEvent;
+import org.example.rentcar.event.BookingCompleteEvent;
+import org.example.rentcar.event.BookingDeclineEvent;
 import org.example.rentcar.model.Booking;
 import org.example.rentcar.request.BookingRequest;
 import org.example.rentcar.request.BookingUpdateRequest;
@@ -9,6 +12,7 @@ import org.example.rentcar.response.APIResponse;
 import org.example.rentcar.service.booking.BookingService;
 import org.example.rentcar.utils.FeedBackMessage;
 import org.example.rentcar.utils.UrlMapping;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class BookingController {
     private final BookingService bookingService;
+    private final ApplicationEventPublisher applicationEventPublisher;
     @PostMapping(UrlMapping.ADD)
     public ResponseEntity<APIResponse> bookCar(@RequestBody BookingRequest bookingRequest,
                                                @RequestParam long carId,
@@ -55,18 +60,21 @@ public class BookingController {
     @PutMapping(UrlMapping.BOOKING_APPROVED)
     public ResponseEntity<APIResponse> approvedBooking(@PathVariable long bookingId) {
         Booking booking = bookingService.approveBooking(bookingId);
+        applicationEventPublisher.publishEvent(new BookingApprovedEvent(booking));
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking.getId()));
     }
 
     @PutMapping(UrlMapping.BOOKING_REJECTED)
     public ResponseEntity<APIResponse> declineBooking(@PathVariable long bookingId) {
         Booking booking = bookingService.declineBooking(bookingId);
+        applicationEventPublisher.publishEvent(new BookingDeclineEvent(booking));
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking.getId()));
     }
 
     @PutMapping(UrlMapping.BOOKING_COMPLETED)
     public ResponseEntity<APIResponse> completeBooking(@PathVariable long bookingId) {
         Booking booking = bookingService.completeBooking(bookingId);
+        applicationEventPublisher.publishEvent(new BookingCompleteEvent(booking));
         return ResponseEntity.ok(new APIResponse(FeedBackMessage.SUCCESS, booking.getId()));
     }
 

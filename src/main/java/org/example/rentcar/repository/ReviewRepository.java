@@ -16,6 +16,8 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     Page<Review> findAllByCarId(@Param("carId") long carId, Pageable pageable);
     @Query("select r from Review  r where r.customer.id =:customerId")
     Page<Review> findAllByCustomerId(@Param("customerId") long customerId, Pageable pageable);
+    @Query("select r from Review  r where r.customer.id =:customerId")
+    List<Review> findAllByCustomerId1(@Param("customerId") long customerId);
 
     Long countByCarId(long id);
 
