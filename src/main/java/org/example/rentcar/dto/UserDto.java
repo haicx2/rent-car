@@ -3,6 +3,7 @@ package org.example.rentcar.dto;
 import lombok.Data;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
@@ -20,5 +21,5 @@ public class UserDto {
     private boolean isEnabled;
     List<ReviewDto> reviewDtos;
     List<BookingDto> bookingDtos;
-    List<CarDto> carDtos;
+    List<CarDto> carDtos = new ArrayList<>();
 }

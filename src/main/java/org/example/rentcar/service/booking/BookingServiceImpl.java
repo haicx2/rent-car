@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -167,14 +168,22 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public List<BookingDto> getBookingByOwnerId(long ownerId) {
-        CarOwner owner = carOwnerRepository.findById(ownerId).orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
-        if (owner.getCars().isEmpty()){
-            return null;
+        CarOwner owner = carOwnerRepository.findById(ownerId)
+                .orElseThrow(() -> new ResourceNotFoundException(FeedBackMessage.NOT_FOUND));
+
+        // If the owner has no cars, return an empty list
+        if (owner.getCars() == null || owner.getCars().isEmpty()) {
+            return Collections.emptyList();
         }
+
         List<BookingDto> bookingDtos = new ArrayList<>();
-        for(Car car : owner.getCars()){
+        for (Car car : owner.getCars()) {
             List<BookingDto> bookingDtos1 = getBookingByCarId(car.getId());
-            bookingDtos.addAll(bookingDtos1);
+
+            // Ensure `bookingDtos1` is not null before adding
+            if (bookingDtos1 != null) {
+                bookingDtos.addAll(bookingDtos1);
+            }
         }
         return bookingDtos;
     }
